@@ -10,16 +10,19 @@ class FeaturesController < ApplicationController
 
     page = params[:page] || 1
 
-    mag_type = params[:mag_type] || nil
+    mag_type = params[:mag_type].split(",") || nil
+
+    puts "mag_type: #{mag_type}"
+    puts "params[mag_type]: #{params[:mag_type]}"
 
     if mag_type
-        @features = Feature.where(magType: mag_type).paginate(page: page, per_page: per_page)
+        @features = Feature.where("magType IN (?)", mag_type).paginate(page: page, per_page: per_page)
     else
         @features = Feature.paginate(page: page, per_page: per_page)
     end
 
     resp = {
-        "data" => @features.parsed,
+        "data" => @features,
         "pagination" => pagination_dict(@features, per_page)
     }
 
